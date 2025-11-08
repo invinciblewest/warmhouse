@@ -1,0 +1,63 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Диаграмма контейнеров экосистемы "Тёплый дом"
+
+Person(user, "Пользователь", "Управляет умным домом")
+System_Boundary(smartHome, "Экосистема умного дома") {
+    Container(webApplication, "Web Application", "SPA", "Интерфейс для управления отоплением, освещением, воротами, наблюдения и просмотра телеметрии")
+
+    Container(userHouseService, "User & House Service", "GO + HTTP API", "Управление пользователями, домами и доступами")
+    ContainerDb(userHouseDatabase, "User & House Database", "PostgreSQL", "Данные о пользователях и домах")
+
+    Container(deviceManagementService, "Device Management Service", "GO + HTTP API", "Регистрация устройств, привязка их к домам")
+    ContainerDb(deviceManagementDatabase, "Device Management Database", "PostgreSQL", "Зарегистрированные устройства")
+
+    Container(heatingService, "Heating Service", "GO + HTTP API", "Управление отоплением в домах")
+    ContainerDb(heatingDatabase, "Heating Database", "PostgreSQL", "Состояние и настройки отопления")
+
+    Container(lightingService, "Lighting Service", "GO + HTTP API", "Управление освещением")
+    ContainerDb(lightingDatabase, "Lighting Database", "PostgreSQL", "Состояние освещения")
+
+    Container(gateService, "Gate Service", "GO + HTTP API", "Управление воротами")
+    ContainerDb(gateDatabase, "Gate Database", "PostgreSQL", "Состояние и настройка управления воротами")
+
+    Container(surveillanceService, "Surveillance Service", "GO + HTTP API", "Удалённое наблюдение")
+    ContainerDb(surveillanceDatabase, "Surveillance Database", "PostgreSQL", "Данные камер")
+
+    Container(telemetryService, "Telemetry Service", "GO + HTTP API", "Приём и хранение телеметрии от устройств")
+    Container(telemetryDatabase, "Telemetry Database", "PostgreSQL", "История телеметрии")
+}
+
+System_Ext(smartDevices, "Устройства умного дома", "Физические устройства: модули отопления, освещения, ворот, камеры и другие датчики")
+
+Rel(user, webApplication, "Использует для управления умным домом", "HTTPS")
+
+Rel(webApplication, userHouseService, "Регистрация, аутентификация, выбор дома", "REST, JSON")
+Rel(userHouseService, userHouseDatabase, "Чтение/Запись", "SQL")
+
+Rel(webApplication, deviceManagementService, "Просмотр и настройка устройств", "REST, JSON")
+Rel(deviceManagementService, deviceManagementDatabase, "Чтение/Запись", "SQL")
+Rel(deviceManagementService, smartDevices, "Регистрация и управление устройствами", "Стандартные протоколы")
+
+Rel(webApplication, heatingService, "Управление отоплением", "REST, JSON")
+Rel(heatingService, heatingDatabase, "Чтение/Запись", "SQL")
+Rel(heatingService, smartDevices, "Команды управления отоплением", "Протокол управления устройствами")
+
+Rel(webApplication, lightingService, "Управление освещением", "REST, JSON")
+Rel(lightingService, lightingDatabase, "Чтение/Запись", "SQL")
+Rel(lightingService, smartDevices, "Команды управления освещением", "Протокол управления устройствами")
+
+Rel(webApplication, gateService, "Управление воротами", "REST, JSON")
+Rel(gateService, gateDatabase, "Чтение/Запись", "SQL")
+Rel(gateService, smartDevices, "Команды управления воротами", "Протокол управления устройствами")
+
+Rel(webApplication, surveillanceService, "Просмотр камеры/наблюдения")
+Rel(surveillanceService, surveillanceDatabase, "Чтение/Запись", "SQL")
+Rel(surveillanceService, smartDevices, "Доступ к видеопотоку", "RTSP")
+
+Rel(webApplication, telemetryService, "Просмотр телеметрии", "REST, JSON")
+Rel(telemetryService, telemetryDatabase, "Чтение/Запись", "SQL")
+Rel(telemetryService, smartDevices, "Приём телеметрии", "Протокол телеметрии")
+
+@enduml

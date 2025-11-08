@@ -1,0 +1,29 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Диаграмма компонентов Telemetry Service
+
+Person(user, "Пользователь", "Просматривает историю показаний (температура и др.) через веб-приложение")
+Container(webApplication, "Web Application", "SPA", "Интерфейс для просмотра телеметрии")
+System_Ext(smartDevices, "Устройства умного дома", "Датчики и устройства, отправляющие телеметрию")
+
+Container_Boundary(telemetryService, "Telemetry Service") {
+  Component(telemetryInApi, "Telemetry Ingestion API", "HTTP/MQTT endpoint", "Принимает телеметрию от устройств (температура и другие параметры)")
+  Component(telemetryQueryApi, "Telemetry Query API", "HTTP handlers", "Предоставляет доступ к историческим данным телеметрии для веб-приложения и других сервисов")
+  Component(telemetryApplication, "Telemetry Application Service", "Сервисный слой", "Обработка входящей телеметрии, агрегация, базовые проверки и маршрутизация")
+  Component(repository, "Telemetry Repository", "Repository", "Хранение и выборка записей телеметрии")
+}
+
+ContainerDb(telemetryDatabase, "Telemetry DB", "PostgreSQL", "История телеметрии")
+
+Rel(user, webApplication, "Просматривает телеметрию")
+Rel(smartDevices, telemetryInApi, "Отправка телеметрии", "HTTP/MQTT/другой протокол")
+Rel(webApplication, telemetryQueryApi, "Запросы истории телеметрии", "REST/JSON")
+
+Rel(telemetryInApi, telemetryApplication, "Передача входящих данных", "")
+Rel(telemetryQueryApi, repository, "Запрос данных телеметрии", "SQL")
+Rel(telemetryApplication, repository, "Чтение/запись телеметрии", "SQL")
+
+Rel(repository, telemetryDatabase, "Чтение/запись", "SQL")
+
+@enduml

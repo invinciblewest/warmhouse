@@ -1,0 +1,32 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Диаграмма компонентов Device Management Service
+
+Person(user, "Пользователь", "Управляет умными устройствами через веб-приложение")
+Container(webApplication, "Web Application", "SPA", "Интерфейс для управления устройствами")
+
+Container_Boundary(deviceManagementService, "Device Management Service") {
+  Component(api, "API", "Go HTTP handlers", "Принимает REST-запросы от веб-приложения: регистрация устройств, привязка к домам, просмотр списка устройств")
+  Component(applicationService, "Application Service", "Сервисный слой", "Реализует бизнес-логику работы с устройствами: проверка прав доступа, регистрации")
+  Component(repository, "Repository", "Go + SQL", "Обеспечивает доступ к базе данных устройств")
+  Component(adapter, "Device Integration Adapter", "Go", "Инкапсулирует протоколы взаимодействия с физическими устройствами и облаками партнёров")
+}
+
+ContainerDb(deviceManagementDatabase, "Device Database", "PostgreSQL", "Данные о зарегистрированных устройствах и их привязке к домам")
+
+System_Ext(smartDevices, "Устройства умного дома", "Физические устройства и платформы партнёров (отопление, освещение, ворота, камеры и другие датчики)")
+Container_Ext(userHouseService, "User & House Service", "Go + HTTP API", "Предоставляет данные о пользователях и их домах")
+
+Rel(user, webApplication, "Управление устройствами через Веб-интерфейс", "HTTPS")
+Rel(webApplication, api, "REST-запросы (регистрация, просмотр, настройка устройств)", "REST/JSON")
+
+Rel(api, applicationService, "Вызовы методов бизнес-логики", "Go")
+Rel(applicationService, repository, "Чтение/запись данных об устройствах", "SQL")
+Rel(applicationService, adapter, "Команды и запросы к устройствам", "Стандартные протоколы")
+Rel(applicationService, userHouseService, "Запрос данных о пользователе/доме для проверки прав", "REST/JSON")
+
+Rel(repository, deviceManagementDatabase, "Чтение/запись", "SQL")
+Rel(adapter, smartDevices, "Регистрация и управление устройствами", "Протоколы устройств / партнёров")
+
+@enduml

@@ -56,23 +56,27 @@
 
 ### 5. Визуализация контекста системы — диаграмма С4
 
-[Контекстная диаграмма системы "Тёплый дом" (As-Is)](./diagrams/as-is/context.png)
+[Контекстная диаграмма системы "Тёплый дом" (As-Is)](schemas/as-is/context.png)
 
 # Задание 2. Проектирование микросервисной архитектуры
 
-В этом задании вам нужно предоставить только диаграммы в модели C4. Мы не просим вас отдельно описывать получившиеся микросервисы и то, как вы определили взаимодействия между компонентами To-Be системы. Если вы правильно подготовите диаграммы C4, они и так это покажут.
-
 **Диаграмма контейнеров (Containers)**
 
-Добавьте диаграмму.
+[Диаграмма контейнеров системы "Тёплый дом"](schemas/to-be/container.png)
 
 **Диаграмма компонентов (Components)**
 
-Добавьте диаграмму для каждого из выделенных микросервисов.
+[Device Management Service](schemas/to-be/component-device-management.png)  
+[User & House Service](schemas/to-be/component-user-house.png)  
+[Heating Service](schemas/to-be/component-heating.png)  
+[Lighting Service](schemas/to-be/component-lighting.png)  
+[Gate Service](schemas/to-be/component-gate.png)  
+[Surveillance Service](schemas/to-be/component-surveillance.png)  
+[Telemetry Service](schemas/to-be/component-telemetry.png)
 
 **Диаграмма кода (Code)**
 
-Добавьте одну диаграмму или несколько.
+[Device Management Service](schemas/to-be/code-device-management.png)
 
 # Задание 3. Разработка ER-диаграммы
 

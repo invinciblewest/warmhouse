@@ -1,0 +1,56 @@
+@startuml
+title Диаграмма кода Device Management Service
+
+class Device {
+  +id: UUID
+  +typeId: UUID
+  +houseId: UUID
+  +serialNumber: string
+  +location: string
+  +status: DeviceStatus
+  --
+  +activate()
+  +deactivate()
+}
+
+enum DeviceStatus {
+  REGISTERED
+  ACTIVE
+  INACTIVE
+}
+
+class DeviceType {
+  +id: UUID
+  +name: string
+  +description: string
+  +supportsTelemetry: bool
+  +supportsCommands: bool
+}
+
+class DeviceRegistrationService {
+  +registerDevice(cmd: RegisterDeviceCommand): Device
+}
+
+class RegisterDeviceCommand {
+  +userId: UUID
+  +houseId: UUID
+  +deviceTypeId: UUID
+  +serialNumber: string
+  +location: string
+}
+
+interface DeviceRepository {
+  +findById(id: UUID): Device
+  +findBySerial(serialNumber: string): Device?
+  +save(device: Device): void
+}
+
+DeviceRegistrationService --> DeviceRepository : использует
+DeviceRegistrationService --> DeviceType : проверяет тип устройства
+DeviceRegistrationService --> Device : создаёт/изменяет
+
+Device "1" --> "1" DeviceType : type
+DeviceRepository ..> Device : управляет
+DeviceRepository ..> DeviceType : читает тип
+
+@enduml

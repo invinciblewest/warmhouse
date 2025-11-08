@@ -1,0 +1,31 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Диаграмма компонентов Heating Service
+
+Person(user, "Пользователь", "Управляет отоплением через веб-приложение")
+Container(webApplication, "Web Application", "SPA", "Интерфейс для управления отоплением")
+Container_Ext(deviceService, "Device Management Service", "HTTP API", "Информация об устройствах и их привязке к домам")
+
+Container_Boundary(heatingService, "Heating Service") {
+  Component(api, "Heating API", "HTTP handlers", "Принимает команды управления отоплением: включение/выключение, изменение режима")
+  Component(heatingApplication, "Heating Application Service", "Сервисный слой", "Бизнес-логика управления отоплением, проверка доступности устройства, проверка прав пользователя")
+  Component(repository, "Heating Repository", "Repository", "Доступ к состоянию и настройкам отопления")
+  Component(heatingAdapter, "Heating Device Adapter", "Интеграционный компонент", "Отправка команд модулю отопления, преобразование форматов команд")
+}
+
+ContainerDb(heatingDatabase, "Heating DB", "PostgreSQL", "Состояние и настройки отопления")
+System_Ext(smartDevices, "Устройства умного дома", "Модули отопления")
+
+Rel(user, webApplication, "Работает через", "HTTPS")
+Rel(webApplication, api, "Команды управления отоплением", "REST/JSON")
+
+Rel(api, heatingApplication, "Вызовы бизнес-логики", "")
+Rel(heatingApplication, repository, "Чтение/запись состояния отопления", "SQL")
+Rel(heatingApplication, heatingAdapter, "Отправка команд устройствам", "")
+Rel(heatingApplication, deviceService, "Получение привязки устройства к дому/пользователю", "REST/JSON")
+
+Rel(repository, heatingDatabase, "Чтение/запись", "SQL")
+Rel(heatingAdapter, smartDevices, "Команды управления отоплением", "Протокол управления устройствами")
+
+@enduml
