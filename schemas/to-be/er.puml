@@ -1,0 +1,70 @@
+@startuml
+title ER-диаграмма основных сущностей
+
+package "User & House Service" {
+    entity "User" as user {
+      * id : UUID
+      --
+      email        : string
+      password_hash: string
+      full_name    : string
+      created_at   : datetime
+      status       : string
+    }
+
+    entity "House" as house {
+      * id       : UUID
+      --
+      user_id   : UUID  <<FK>>
+      name      : string
+      address   : string
+      timezone  : string
+      created_at: datetime
+    }
+}
+
+package "Device Management Service" {
+    entity "DeviceType" as dev_type {
+      * id               : UUID
+      --
+      name              : string
+      category          : string  // heating, lighting, gate, camera, sensor
+      description       : string
+      supportsTelemetry : bool
+      supportsCommands  : bool
+    }
+
+    entity "Device" as dev {
+      * id           : UUID
+      --
+      house_id      : UUID  <<FK>>
+      device_type_id: UUID  <<FK>>
+      serial_number : string
+      location      : string  // комната: Living Room, Bedroom и т.п.
+      status        : string  // active, inactive, error
+      created_at    : datetime
+      last_seen_at  : datetime
+    }
+}
+
+package "Telemetry Service" {
+    entity "TelemetryData" as tdata {
+      * id        : UUID
+      --
+      device_id  : UUID    <<FK>>
+      ts         : datetime
+      metric_type: string  // temperature, humidity и т.п.
+      value_num  : float
+    }
+}
+
+
+user ||--o{ house : "1:N\nпользователь — дома"
+
+house ||--o{ dev : "1:N\nдом — устройства"
+
+dev_type ||--o{ dev : "1:N\nтип — устройства"
+
+dev ||--o{ tdata : "1:N\nустройство — телеметрия"
+
+@enduml

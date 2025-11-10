@@ -1,0 +1,28 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Диаграмма компонентов User & House Service
+
+Person(user, "Пользователь", "Управляет умным домом через веб-приложение")
+Container(webApplication, "Web Application", "SPA", "Интерфейс для управления домами и устройствами")
+
+Container_Boundary(userSvc, "User & House Service") {
+  Component(api, "User & House API", "HTTP handlers", "Обрабатывает REST-запросы: управление аккаунтом, домами, доступами.")
+  Component(applicationService, "User & House Application Service", "Сервисный слой", "Бизнес-логика работы с пользователями и домами: создание дома, привязка пользователя, проверка прав.")
+  Component(userRepository, "User Repository", "Repository", "Доступ к данным пользователей.")
+  Component(houseRepository, "House Repository", "Repository", "Доступ к данным домов и их связи с пользователями.")
+}
+
+ContainerDb(userDatabase, "User & House DB", "PostgreSQL", "Пользователи, дома и права доступа.")
+
+Rel(user, webApplication, "Работает через", "HTTPS")
+Rel(webApplication, api, "REST-запросы (профиль, список домов и т.п.)", "REST/JSON")
+
+Rel(api, applicationService, "Вызывает методы бизнес-логики", "")
+Rel(applicationService, userRepository, "Чтение/запись пользователей", "SQL")
+Rel(applicationService, houseRepository, "Чтение/запись домов и связей", "SQL")
+
+Rel(userRepository, userDatabase, "Чтение/запись", "SQL")
+Rel(houseRepository, userDatabase, "Чтение/запись", "SQL")
+
+@enduml

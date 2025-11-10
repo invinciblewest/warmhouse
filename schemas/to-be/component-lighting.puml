@@ -1,0 +1,31 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Диаграмма компонентов Lighting Service
+
+Person(user, "Пользователь", "Управляет освещением через веб-приложение")
+Container(webApplication, "Web Application", "SPA", "Интерфейс для управления освещением")
+Container_Ext(deviceService, "Device Management Service", "HTTP API", "Информация об устройствах и их привязке к домам")
+
+Container_Boundary(lightService, "Lighting Service") {
+  Component(lightApi, "Lighting API", "HTTP handlers", "Принимает команды включения/выключения освещения")
+  Component(lightApplication, "Lighting Application Service", "Сервисный слой", "Бизнес-логика управления освещением, проверка прав и доступности устройств")
+  Component(repository, "Lighting Repository", "Repository", "Хранение состояния освещения (включено/выключено, сцены)")
+  Component(lightAdapter, "Lighting Device Adapter", "Интеграционный компонент", "Отправка команд осветительным устройствам")
+}
+
+ContainerDb(lightDatabase, "Lighting DB", "PostgreSQL", "Состояние освещения")
+System_Ext(smartDevices, "Устройства умного дома", "Осветительные устройства")
+
+Rel(user, webApplication, "Работает через", "HTTPS")
+Rel(webApplication, lightApi, "Команды управления освещением", "REST/JSON")
+
+Rel(lightApi, lightApplication, "Вызовы бизнес-логики", "")
+Rel(lightApplication, repository, "Чтение/запись состояния освещения", "SQL")
+Rel(lightApplication, lightAdapter, "Отправка команд устройствам", "")
+Rel(lightApplication, deviceService, "Получение информации об устройстве/комнате", "REST/JSON")
+
+Rel(repository, lightDatabase, "Чтение/запись", "SQL")
+Rel(lightAdapter, smartDevices, "Команды управления освещением", "Протокол управления устройствами")
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Диаграмма компонентов Gate Service
+
+Person(user, "Пользователь", "Управляет воротами через веб-приложение")
+Container(webApplication, "Web Application", "SPA", "Интерфейс для управления воротами")
+Container_Ext(deviceService, "Device Management Service", "HTTP API", "Информация об устройствах и их привязке к домам")
+
+Container_Boundary(gateSvc, "Gate Service") {
+  Component(api, "Gate API", "HTTP handlers", "Принимает команды открытия/закрытия ворот")
+  Component(gateApplication, "Gate Application Service", "Сервисный слой", "Бизнес-логика управления воротами, проверка прав и безопасных сценариев")
+  Component(repository, "Gate Repository", "Repository", "Хранение состояния ворот (открыто/закрыто, режимы)")
+  Component(gateAdapter, "Gate Device Adapter", "Интеграционный компонент", "Отправка команд устройствам ворот")
+}
+
+ContainerDb(gateDatabase, "Gate DB", "PostgreSQL", "Состояние ворот")
+System_Ext(smartDevices, "Устройства умного дома", "Автоматические ворота и приводы")
+
+Rel(user, webApplication, "Работает через", "HTTPS")
+Rel(webApplication, api, "Команды управления воротами", "REST/JSON")
+
+Rel(api, gateApplication, "Вызовы бизнес-логики", "")
+Rel(gateApplication, repository, "Чтение/запись состояния ворот", "SQL")
+Rel(gateApplication, gateAdapter, "Отправка команд устройствам", "")
+Rel(gateApplication, deviceService, "Получение информации об устройстве/доме", "REST/JSON")
+
+Rel(repository, gateDatabase, "Чтение/запись", "SQL")
+Rel(gateAdapter, smartDevices, "Команды управления воротами", "Протокол управления устройствами")
+
+@enduml

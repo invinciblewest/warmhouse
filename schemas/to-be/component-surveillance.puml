@@ -1,0 +1,31 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Диаграмма компонентов Surveillance Service
+
+Person(user, "Пользователь", "Просматривает видео/камеры через веб-приложение")
+Container(webApp, "Web Application", "SPA", "Интерфейс для наблюдения")
+Container_Ext(deviceService, "Device Management Service", "HTTP API", "Информация о камерах и их привязке к домам")
+
+Container_Boundary(survService, "Surveillance Service") {
+  Component(api, "Surveillance API", "HTTP handlers", "Предоставляет ссылки/токены для доступа к потокам/снимкам камер")
+  Component(survApplication, "Surveillance Application Service", "Сервисный слой", "Бизнес-логика управления доступом к камерам, проверка прав пользователя")
+  Component(repository, "Surveillance Repository", "Repository", "Хранит метаданные камер, настройки доступа и истории подключений")
+  Component(cameraAdapter, "Camera Adapter", "Интеграционный компонент", "Инкапсулирует протоколы доступа к IP-камерам и другим системам наблюдения")
+}
+
+ContainerDb(survDatabase, "Surveillance DB", "PostgreSQL", "Метаданные камер и настройки")
+System_Ext(smartDevices, "Устройства умного дома", "IP-камеры и видеосистемы")
+
+Rel(user, webApp, "Работает через", "HTTPS")
+Rel(webApp, api, "Запросы на просмотр камер/получение потоков", "REST/JSON")
+
+Rel(api, survApplication, "Вызовы бизнес-логики", "")
+Rel(survApplication, repository, "Чтение/запись метаданных камер", "SQL")
+Rel(survApplication, cameraAdapter, "Запрос доступа к камерам", "")
+Rel(survApplication, deviceService, "Получение информации о привязке камер к домам/пользователям", "REST/JSON")
+
+Rel(repository, survDatabase, "Чтение/запись", "SQL")
+Rel(cameraAdapter, smartDevices, "Доступ к видеопотоку/снимкам", "RTSP/HTTP")
+
+@enduml
